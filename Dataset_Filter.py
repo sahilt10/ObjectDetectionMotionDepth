@@ -3,17 +3,14 @@ import shutil
 import random
 from ultralytics import YOLO
 
-# Load YOLOv8 model (pre-trained on COCO dataset)
-model = YOLO("yolov8n.pt").to("cuda")  # You can use 'yolov8s.pt' for better accuracy
+model = YOLO("yolov8n.pt").to("cuda")
 
-# Define relevant object classes (from COCO dataset)
 RELEVANT_CLASSES = {"person", "car", "bus", "truck", "motorcycle", "bicycle", "horse", "dog", "cat", "bird", "sheep", "cow", "elephant", "bear", "zebra", "giraffe"}
 
 def detect_objects_batch(image_paths):
     """Runs object detection on a batch of images and returns a set of valid image names."""
     valid_names = set()
-    
-    # Run YOLO inference on a batch of images
+
     results = model(image_paths, device="cuda" if model.device.type != "cpu" else "cpu")  # Use GPU if available
     
     for img_path, result in zip(image_paths, results):
@@ -40,14 +37,11 @@ def create_subset(original_dataset_path, subset_dataset_path, detection_results,
     print(f"Total train images found: {len(image_files)}")
     print(f"Total train masks found: {len(mask_files)}")
 
-    # Remove file extensions for proper matching
     image_names = {os.path.splitext(f)[0] for f in image_files}
     mask_names = {os.path.splitext(f)[0] for f in mask_files}
     
-    # Find common names (images that have corresponding masks)
     valid_names = list(image_names & mask_names)
 
-    # Filter images that contain relevant objects using batch inference
     relevant_images = set()
     for i in range(0, len(valid_names), 32):
         batch_files = [os.path.join(train_images_path, name + ".jpg") for name in valid_names[i:i+32]]
@@ -69,7 +63,6 @@ def create_subset(original_dataset_path, subset_dataset_path, detection_results,
     selected_names = random.sample(filtered_names, actual_sample_size)
 
     for name in selected_names:
-        # Find the correct extensions
         img_file = next(f for f in image_files if os.path.splitext(f)[0] == name)
         mask_file = next(f for f in mask_files if os.path.splitext(f)[0] == name)
 
@@ -79,9 +72,8 @@ def create_subset(original_dataset_path, subset_dataset_path, detection_results,
     print(f"Subset created with {actual_sample_size} images and masks in {subset_dataset_path}")
 
 
-# Example usage
-original_dataset = "C:/College/Capstone/Dataset"  # Change this
-target_dataset = "C:/College/Capstone/Sub-Dataset"  # Change this
+original_dataset = "C:/College/Capstone/Dataset"
+target_dataset = "C:/College/Capstone/Sub-Dataset" 
 num_samples = 1000
 
 create_subset(original_dataset, target_dataset, num_samples)
