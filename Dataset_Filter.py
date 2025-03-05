@@ -11,12 +11,12 @@ def detect_objects_batch(image_paths):
     """Runs object detection on a batch of images and returns a set of valid image names."""
     valid_names = set()
 
-    results = model(image_paths, device="cuda" if model.device.type != "cpu" else "cpu")  # Use GPU if available
+    results = model(image_paths, device="cuda" if model.device.type != "cpu" else "cpu") 
     
     for img_path, result in zip(image_paths, results):
-        detected_classes = {model.names[int(cls)] for cls in result.boxes.cls}  # Get detected class names
-        if detected_classes & RELEVANT_CLASSES:  # Check if any relevant class is detected
-            valid_names.add(os.path.splitext(os.path.basename(img_path))[0])  # Store name without extension
+        detected_classes = {model.names[int(cls)] for cls in result.boxes.cls}
+        if detected_classes & RELEVANT_CLASSES:  
+            valid_names.add(os.path.splitext(os.path.basename(img_path))[0]) 
     
     return valid_names
 
