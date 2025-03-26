@@ -1,0 +1,28 @@
+# YOLOv8 Custom Model Configuration
+
+# Network structure
+nc: 3  # Number of classes (person, vehicle, animal)
+depth_multiple: 1.0  
+width_multiple: 1.0  
+
+# Backbone (Feature Extractor)
+backbone:
+  - type: Conv  # Extra Convolutional Layer (Improves Feature Extraction)
+    args: [64, 3, 1, 1]
+  - type: C2f
+    args: [128, 3, True]
+  - type: Conv
+    args: [256, 3, 1, 1]
+  - type: SPPF  # Spatial Pyramid Pooling
+    args: [512, 5]
+
+# Head (Detection Layer)
+head:
+  - type: Conv
+    args: [512, 3, 1, 1]
+  - type: C2f
+    args: [256, 3, True]
+  - type: Detect  # Final Detection Layer
+    args:
+      num_classes: 3  # Person, Vehicle, Animal
+      anchors: [[10,13, 16,30, 33,23], [30,61, 62,45, 59,119], [116,90, 156,198, 373,326]]
