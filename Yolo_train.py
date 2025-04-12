@@ -1,45 +1,52 @@
 from ultralytics import YOLO
 
-# Load the YOLO model with pre-trained weights
-model = YOLO("yolov8n.pt")  # Load YOLOv8 nano pre-trained weights
-folder_name = "C:/College/Capstone/YoloModels" 
-exp_name="exp1"
+def main():
+    model = YOLO("yolov8n.yaml").load("yolov8n.pt") 
+    folder_name = "C:/College/Capstone/YoloModels"
+    exp_name = "exp5"
 
-# Freeze first 10 layers manually
-for param in list(model.model.parameters())[:10]:
-    param.requires_grad = False  # Freeze layers
+    #Freezing 5 layers
+    for param in list(model.model.parameters())[:5]:
+        param.requires_grad = False
 
-# Train only the final layers
-model.train(
-    data="C:/College/Capstone/Filtered Dataset/Dataset.yaml",  # Path to dataset.yaml
-    epochs=100,  # Increase for better accuracy
-    batch=16,  # Adjust based on GPU memory
-    imgsz=640,  # Image size
-    lr0=0.0005,  # Learning rate (lower for fine-tuning)
-    device="cuda",  # Use GPU
-    workers=0,  # Speed up training
-    project=folder_name,  # Custom folder for saving results
-    name=exp_name,  # Experiment name
-    exist_ok=False
-)
+    model.train(
+        data="C:/College/Capstone/Filter/Dataset.yaml",
+        epochs=100,
+        imgsz=704,
+        batch=16,
+        workers=2,
+        verbose=True,
+        plots=True,
+        lr0=0.001,
+        lrf=0.01,
+        weight_decay=0.0005,
+        cos_lr=True,
+        warmup_epochs=3,
+        warmup_momentum=0.8,
+        warmup_bias_lr=0.1,
+        patience=0,
+        hsv_h=0.015,
+        hsv_s=0.7,
+        hsv_v=0.4,
+        degrees=0.2,
+        translate=0.2,
+        scale=0.5,
+        shear=0.2,
+        perspective=0.0001,
+        flipud=0.0,
+        fliplr=0.5,
+        mosaic=1,
+        mixup=0.075,
+        copy_paste=0.15,
+        close_mosaic=10,
+        amp=True,
+        cache='disk',
+        resume=False,
+        save_period=5,  
+        project=folder_name,
+        name=exp_name,
+        exist_ok=False
+    )
 
-# Load the fine-tuned model
-model = YOLO(f"{folder_name}/{exp_name}/weights/best.pt")
-
-# Evaluate on Train set
-train_metrics = model.val(split="train", workers=0)
-print(f"Train mAP@50: {train_metrics.box.map:.4f}")  # Train Mean Average Precision
-print(f"Train Precision: {train_metrics.box.mp:.4f}")
-print(f"Train Recall: {train_metrics.box.mr:.4f}")
-
-# Evaluate on Validation set
-val_metrics = model.val(split="val", workers=0)
-print(f"Validation mAP@50: {val_metrics.box.map:.4f}")  # Validation Mean Average Precision
-print(f"Validation Precision: {val_metrics.box.mp:.4f}")
-print(f"Validation Recall: {val_metrics.box.mr:.4f}")
-
-# Evaluate on Test set
-test_metrics = model.val(split="test", workers=0)
-print(f"Test mAP@50: {test_metrics.box.map:.4f}")  # Test Mean Average Precision
-print(f"Test Precision: {test_metrics.box.mp:.4f}")
-print(f"Test Recall: {test_metrics.box.mr:.4f}")
+if __name__ == "__main__":
+    main()
