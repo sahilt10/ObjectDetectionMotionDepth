@@ -46,7 +46,7 @@ while cap_left.isOpened() and cap_right.isOpened():
             x1, y1, x2, y2 = map(int, box.xyxy[0].cpu().numpy())  # Bounding box coordinates
             conf = float(box.conf[0])  # Confidence score
             cls = int(box.cls[0])  # Class ID
-            label = class_names.get(cls, "Unknown")  # Get class label
+            label = class_names.get(cls, "Unknown")  # Getting class label
 
             # Computing center of bounding box
             center_x = (x1 + x2) // 2
